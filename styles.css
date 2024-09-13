@@ -1,0 +1,30 @@
+.webix_state_off button.webix_button {
+    background: green;
+    color: black;
+}
+
+.webix_state_off button.webix_button:hover {
+    background: rgb(124, 223, 124);
+    color: black;
+}
+
+.webix_state_asc button.webix_button {
+    background: red;
+    color: black;
+}
+
+.webix_state_asc button.webix_button:hover {
+    background: rgb(192, 72, 72);
+    color: black;
+
+}
+
+.webix_state_desc button.webix_button {
+    background: yellow;
+    color: black;
+}
+
+.webix_state_desc button.webix_button:hover {
+    background: rgb(236, 236, 138);
+    color: black;
+}
