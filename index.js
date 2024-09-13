@@ -3,28 +3,36 @@ const customButtom = webix.protoUI(
         name: "threestateButton",
 
         $init: function (config) {
-            let state = config.state;
+
+
             let states = config.states;
+            let state = !config.state ? Object.keys(states)[0] : config.state;
             let value = states[state] || 0;
             config.value = value;
 
-            const length = Object.keys(states).length;
+            const entries = Object.entries(states);
+
+            let idx = 0;
 
             this.attachEvent("onItemClick", function (id, ev) {
-                webix.html.removeCss(this.$view, "webix_state_" + (state))
-                ++state;
-                if (state >= length) {
-                    state = 0;
+                webix.html.removeCss(this.$view, "webix_state_" + entries[idx][0]);
+                ++idx;
+
+                if (idx > entries.length - 1) {
+                    idx = 0;
                 }
 
-                let value = this.config.states[state]
+                const entry = entries[idx];
+                const key = entry[0]
+                const value = entry[1];
+
+
                 this.config.value = value;
                 this.config.state = state;
-
-                webix.html.addCss(this.$view, "webix_state_" + state);
+                webix.html.addCss(this.$view, "webix_state_" + key);
                 this.refresh();
 
-                $$(id).callEvent("onStateChange", [state]);
+                $$(id).callEvent("onStateChange", [key]);
             });
         },
 
@@ -85,7 +93,6 @@ const customForm = webix.protoUI(
             ];
 
             config.elements[0].rows = config.fields;
-
         },
 
         fields_setter: function (fields) {
@@ -112,17 +119,17 @@ const customForm = webix.protoUI(
 const threestateButtonInstance = {
     view: "threestateButton",
     id: "threestateButton",
-    state: 0,
+    state: "off",
     width: 200,
-    states: { 0: "Off", 1: "SortAsc", 2: "Sort Desc" },
+    states: { "off": "Off", "asc": "SortAsc", "desc": "Sort Desc" },
     on: {
         onStateChange: function (state) {
 
-            if (state == 1) {
+            if (state == "off") {
                 $$("mylist").sort("#name#", "asc");
-            } else if (state == 2) {
+            } else if (state == "asc") {
                 $$("mylist").sort("#name#", "desc");
-            } else if (state == 0) {
+            } else if (state == "desc") {
                 $$("mylist").sort("#id#", "asc", "int");
             }
         },
