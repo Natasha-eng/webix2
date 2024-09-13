@@ -1,33 +1,30 @@
-.off button.webix_button {
+.webix_state_0 button.webix_button {
     background: green;
     color: black;
 }
 
-.off button.webix_button:hover {
+.webix_state_0 button.webix_button:hover {
     background: rgb(124, 223, 124);
     color: black;
 }
 
-.sortAsc button.webix_button {
+.webix_state_1 button.webix_button {
     background: red;
     color: black;
-
 }
 
-.sortAsc button.webix_button:hover {
+.webix_state_1 button.webix_button:hover {
     background: rgb(192, 72, 72);
     color: black;
 
 }
 
-.sortDesc button.webix_button{
+.webix_state_2 button.webix_button{
     background: yellow;
     color: black;
-    ;
 }
 
-.sortDesc button.webix_button:hover{
+.webix_state_2 button.webix_button:hover{
     background: rgb(236, 236, 138);
     color: black;
-    ;
 }

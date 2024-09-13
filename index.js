@@ -1,53 +1,35 @@
-
-
-
 const customButtom = webix.protoUI(
     {
         name: "threestateButton",
 
         $init: function (config) {
-            this.$ready.push(this.initState);
+            let state = config.state;
+            let states = config.states;
+            let value = states[state] || 0;
+            config.value = value;
+
+            const length = Object.keys(states).length;
 
             this.attachEvent("onItemClick", function (id, ev) {
-                ++config.state;
-                let states = config.states;
-                let state = config.state;
-                const entries = Object.entries(states);
-
-                for (const [key, value] of entries) {
-                    if (state == key && state < entries.length) {
-                        this.config.value = value;
-                        this.config.state = state;
-                        this.refresh();
-                    } else if (state >= entries.length) {
-                        state = 0;
-                        config.state = state;
-                        this.config.value = value;
-                        this.refresh();
-                    }
+                webix.html.removeCss(this.$view, "webix_state_" + (state))
+                ++state;
+                if (state >= length) {
+                    state = 0;
                 }
+
+                let value = this.config.states[state]
+                this.config.value = value;
+                this.config.state = state;
+
+                webix.html.addCss(this.$view, "webix_state_" + state);
+                this.refresh();
 
                 $$(id).callEvent("onStateChange", [state]);
             });
         },
 
-        initState: function () {
-            const state = this.config.state;
-            const id = this.config.id;
-
-            if (state == 0) {
-                webix.html.addCss($$(id).getNode(), "off");
-                this.config.value = "Off";
-            } else if (state == 1) {
-                webix.html.addCss($$(id).getNode(), "sortAsc");
-                this.config.value = "sort Asc";
-            } else {
-                webix.html.addCss($$(id).getNode(), "sortDesc");
-                this.config.value = "sort Desc";
-            }
-        },
-
         state_setter: function (state) {
+            webix.html.addCss(this.$view, "webix_state_" + state);
             return state;
         },
 
@@ -61,9 +43,20 @@ const customButtom = webix.protoUI(
 const customForm = webix.protoUI(
     {
         name: "customForm",
+        defaults: {
+            saveAction: () => {
+                console.log("default save button is clicked");
+                webix.message("default save button ");
+            },
+
+            cancelAction: () => {
+                console.log("default cancel button is clicked");
+                webix.message("default cancel button ");
+            },
+        },
 
         $init: function (config, ev) {
-            const id = config.id;
+
             config.elements = [
                 {
                     rows: [],
@@ -71,53 +64,28 @@ const customForm = webix.protoUI(
                 {
                     cols: [
                         {
-                            id: "cancel",
                             view: "button",
                             value: "Cancel",
+                            click: function (id) {
+                                const form = this.queryView({ view: "customForm" }, "parent")
+                                form.config.cancelAction.call(form)
+                            }
                         },
                         {
-                            id: "save",
                             view: "button",
                             value: "Save",
+
+                            click: function (id) {
+                                const form = this.queryView({ view: "customForm" }, "parent")
+                                form.config.saveAction.call(form)
+                            }
                         },
                     ],
                 },
             ];
 
-
-            this.$ready.push(this.cancel)
-            this.$ready.push(this.save)
-
             config.elements[0].rows = config.fields;
 
-        },
-
-        cancel: function (ev) {
-            const id = this.config.id;
-            const saveaction = this.config.saveAction;
-            const butt = this.queryView({ id: "cancel" })
-            butt.attachEvent("onItemClick", function (id) {
-                if (saveaction) {
-                    saveaction(id)
-
-                } else {
-                    console.log("default cancel button is clicked", id);
-                    webix.message("default cancel button " + id);
-                }
-            });
-        },
-        save: function () {
-            const saveaction = this.config.saveAction;
-
-            const butt = this.queryView({ id: "save" })
-            butt.attachEvent("onItemClick", function (id) {
-                if (saveaction) {
-                    saveaction()
-                } else {
-                    console.log("default save button is clicked", id);
-                    webix.message("default save button " + id);
-                }
-            });
         },
 
         fields_setter: function (fields) {
@@ -129,10 +97,10 @@ const customForm = webix.protoUI(
                     view: "text",
                     name: fields[i],
                     label: fields[i],
+                    value: ""
                 };
                 fields[i] = field
             }
-
 
             return fields;
         },
@@ -152,16 +120,10 @@ const threestateButtonInstance = {
 
             if (state == 1) {
                 $$("mylist").sort("#name#", "asc");
-                webix.html.addCss($$("threestateButton").getNode(), "sortAsc");
-                webix.html.removeCss($$("threestateButton").getNode(), "off");
             } else if (state == 2) {
                 $$("mylist").sort("#name#", "desc");
-                webix.html.addCss($$("threestateButton").getNode(), "sortDesc");
-                webix.html.removeCss($$("threestateButton").getNode(), "sortAsc");
             } else if (state == 0) {
                 $$("mylist").sort("#id#", "asc", "int");
-                webix.html.addCss($$("threestateButton").getNode(), "off");
-                webix.html.removeCss($$("threestateButton").getNode(), "sortDesc");
             }
         },
     },
@@ -187,8 +149,7 @@ const list = {
         { id: 11, name: "Paolo Sanders", age: 40, country: "Spain" },
         { id: 12, name: "Tanya Krieg", age: 28, country: "Germany" },
     ],
-    template: "#id# .#name# - #country#",
-    autoconfig: true,
+    template: "#id#. #name# - #country#",
 }
 
 const formInstance = {
@@ -197,9 +158,15 @@ const formInstance = {
     maxwidth: 300,
     fields: ["one", "two"],
     saveAction: function () {
+        console.log('getValues', this.getValues())
         console.log("custom saveAction is  called");
         webix.message("custom saveAction is  called ");
     },
+    cancelAction: function () {
+        console.log('getValues', this.getValues())
+        console.log("custom cancelAction is called");
+        webix.message("custom cancelAction is called ");
+    }
 }
 
 webix.ready(function () {
