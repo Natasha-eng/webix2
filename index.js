@@ -9,6 +9,7 @@ const customButtom = webix.protoUI(
             let state = !config.state ? Object.keys(states)[0] : config.state;
             let value = states[state] || 0;
             config.value = value;
+            webix.html.addCss(this.$view, "webix_state_" + state);
 
             const entries = Object.entries(states);
 
@@ -37,7 +38,7 @@ const customButtom = webix.protoUI(
         },
 
         state_setter: function (state) {
-            webix.html.addCss(this.$view, "webix_state_" + state);
+
             return state;
         },
 
